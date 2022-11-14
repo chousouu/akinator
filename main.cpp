@@ -3,17 +3,14 @@
 
 int main()
 {
+    int size = CountSymbols("sheesh.txt");
 
-Tree *tree = CreateTree(5);
+    char *buffer = ReadToBuffer("sheesh.txt", size);
 
-AddNode(tree->root, 4, LEFT_NODE);
-AddNode(tree->root, 6, RIGHT_NODE);
+    Tree *tree = BufferParser(buffer, size);
 
-AddNode(tree->root->left, 2, LEFT_NODE);
-AddNode(tree->root->left, 3, LEFT_NODE);
+    InOrder(tree->root);
 
-InOrder(tree->root);
-
-TreeDtor(tree);
+    TreeDtor(tree);
 
 }

@@ -9,6 +9,8 @@ Tree *CreateTree(elem_t value)
         printf("ERROR CREATETREE\n");
     }
     
+    tree->size = 0;
+    
     tree->root = CreateNode(value);
 
     tree->size = 1;
@@ -33,7 +35,7 @@ Node *CreateNode(elem_t value)
     return node_ptr;
 }
 
-//net tree->size++; ???? nuzhen li
+//net tree->size++; ???? nuzhen lix
 
 Node *AddNode(struct Node *tree, elem_t value, int child)
 {
@@ -69,7 +71,7 @@ void InOrder(struct Node *tree)
     {
         InOrder(tree->left);
     }
-    printf("%d ", tree->data);
+    printf("%s ", tree->data);
     if(tree->right)
     {
         InOrder(tree->right);

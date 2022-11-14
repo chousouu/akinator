@@ -1,10 +1,10 @@
-#ifndef AKINATOR_H
-#define AKINATOR_H
+#ifndef TREE_H
+#define TREE_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef int elem_t;
+typedef char * elem_t;
 
 const int LEFT_NODE = 0x32;
 const int RIGHT_NODE = 0x64;
@@ -33,4 +33,4 @@ void InOrder(struct Node *tree);
 void NodeDtor(struct Node *node);
 
 void TreeDtor(struct Tree *tree);
-#endif// AKINATOR_H
+#endif// TREE_H

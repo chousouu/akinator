@@ -5,43 +5,34 @@ Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
     int total_lines = 0;
     int word_len = 0; 
 
-    char **save_addy_start_of_word = (char **)calloc(buffer_size, sizeof(char*));
-    //if NULL ->return;
-
-// TODO : add len of strings 
-
-    // get total_lines, ptr of words,
     for(int i = 0; i < buffer_size; i++)
     {
         if(buffer[i] == '{')
         {
-            save_addy_start_of_word[2 * total_lines] = word_len;
-            save_addy_start_of_word[2 * total_lines + 1] = buffer + i + 1;
-            word_len = 0;
-            total_lines += 1;
-        }
-        if(buffer[i] != '{' && buffer[i] != '}')
-        {
-            word_len++;
+            total_lines++;
         }
     }
 
-    Option_info *text = (Option_info *)calloc(total_lines, sizeof(Option_info));
-    for(int i = 0; i < total_lines; i++)
+    // get total_lines, ptr of words,
+    Option_info *text_info = (Option_info *)calloc(total_lines + 2, sizeof(Option_info));
+    
+    char sep[10]="{}";
+    int i = 0;
+
+    text_info[i].text_ptr = strtok(buffer, sep);
+
+    while (text_info[i].text_ptr != NULL)
     {
-        word_len = save_addy_start_of_word[i + 1] - save_addy_start_of_word[i];
-        text[i].text_ptr = save_addy_start_of_word[i];
-        text[i].len = 0;
+        i++;
+        printf("STROKi: %s\n", text_info[i].text_ptr);
+        text_info[i].text_ptr = strtok(NULL, sep);
     }
-
 
     Akinator_Info *Akinator = (Akinator_Info *)calloc(1, sizeof(Akinator_Info));
 
     Akinator->buffer = buffer;
-    Akinator->Strings = text;
+    Akinator->Strings = text_info;
     Akinator->lines_total = total_lines;
-
-    free(save_addy_start_of_word);
 
     return Akinator;
 }

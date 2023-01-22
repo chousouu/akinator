@@ -7,10 +7,24 @@ int main()
 
     char *buffer = ReadToBuffer("sheesh.txt", size);
 
-    Tree *tree = BufferParser(buffer, size);
+    Akinator_Info *akinator = GetAkinatorStruct(buffer, size);
 
-    InOrder(tree->root);
+    printf("lines total = %d:\n", akinator->lines_total);
+    for(int i = 0; i < akinator->lines_total; i++)
+    {
+        printf("%d: %s\n", i, akinator->Strings[i].text_ptr);
+    }
 
-    TreeDtor(tree);
 
+    // printf("%s\n", NULL);
+
+    // InOrder(akinator->root);
+
+    // TreeDtor(akinator);
+
+    free(akinator->Strings);
+    free(akinator);
+    free(buffer);
+    
+    return 0;
 }

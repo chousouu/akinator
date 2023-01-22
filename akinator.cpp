@@ -15,7 +15,7 @@ Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
 
     // get total_lines, ptr of words,
     Option_info *text_info = (Option_info *)calloc(total_lines + 2, sizeof(Option_info));
-    
+    /////////////////////////////////////////////////////////////^
     char sep[10]="{}";
     int i = 0;
 
@@ -24,7 +24,6 @@ Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
     while (text_info[i].text_ptr != NULL)
     {
         i++;
-        printf("STROKi: %s\n", text_info[i].text_ptr);
         text_info[i].text_ptr = strtok(NULL, sep);
     }
 

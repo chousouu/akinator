@@ -1,81 +1,49 @@
 #include "akinator.h"
 // xz kak nazvat, no ne parser 
-Tree* BufferParser(char *buffer, int buffer_size)
+Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
 {
-    char arg[30] = "";
-    int arg_length = 0;
-    int i = 0;
-    // for(int z = 0; z < buffer_size; z++)
-    // {
-    //     printf("%d '%c' ", z, buffer[z]);
-    // }
+    int total_lines = 0;
+    int word_len = 0; 
 
-    printf("==================\n");
+    char **save_addy_start_of_word = (char **)calloc(buffer_size, sizeof(char*));
+    //if NULL ->return;
 
-    int counter = 0;
+// TODO : add len of strings 
 
-    for(; i < buffer_size; i++)
-    {    
-        if(buffer[i] == '{') 
+    // get total_lines, ptr of words,
+    for(int i = 0; i < buffer_size; i++)
+    {
+        if(buffer[i] == '{')
         {
-            i++;
-            while(buffer[i] != '}' && buffer[i] != '{')
-            {
-                if(!(buffer[i] == ' ' || buffer[i] == '\n' || buffer[i] == '\t'))
-                {
-                    arg[counter++] = buffer[i];
-                }
-                i++;
-            }
-            DEB("arg root = %s\n", arg);
-            break;
+            save_addy_start_of_word[2 * total_lines] = word_len;
+            save_addy_start_of_word[2 * total_lines + 1] = buffer + i + 1;
+            word_len = 0;
+            total_lines += 1;
+        }
+        if(buffer[i] != '{' && buffer[i] != '}')
+        {
+            word_len++;
         }
     }
 
-    Tree *tree = CreateTree(arg);
-
-    CreateQuestion(tree->root, buffer, i, buffer_size);
-
-    return tree;
-}
-
-void CreateQuestion(Node *destination, char *buffer, int index, int buffer_size)
-{
-    destination->left  = CreateNode (NULL);
-    destination->right = CreateNode (NULL);
-
-    char arg[50] = "";
-    int arg_length = 0;
-
-    int counter = 0;
-
-    for(; index < buffer_size; index++)
-    {    
-        if(buffer[index] == '{') 
-        {
-            index++;
-            
-            if(buffer[index] == '}') return;
-
-            while(buffer[index] != '}' && buffer[index] != '{')
-            {
-                if(!(buffer[index] == ' ' || buffer[index] == '\n' || buffer[index] == '\t'))
-                {
-                    arg[counter++] = buffer[index];
-                }
-                index++;
-            }
-            DEB("arg root = %s\n", arg);
-            break;
-        }
+    Option_info *text = (Option_info *)calloc(total_lines, sizeof(Option_info));
+    for(int i = 0; i < total_lines; i++)
+    {
+        word_len = save_addy_start_of_word[i + 1] - save_addy_start_of_word[i];
+        text[i].text_ptr = save_addy_start_of_word[i];
+        text[i].len = 0;
     }
-    DEB("dest->data = %s\n", arg);
-    
-    destination->data = arg;
-    
-    CreateQuestion(destination->left, buffer, index, buffer_size);
-    CreateQuestion(destination->right, buffer, index, buffer_size);
 
+
+    Akinator_Info *Akinator = (Akinator_Info *)calloc(1, sizeof(Akinator_Info));
+
+    Akinator->buffer = buffer;
+    Akinator->Strings = text;
+    Akinator->lines_total = total_lines;
+
+    free(save_addy_start_of_word);
+
+    return Akinator;
 }
 
 int CountSymbols(const char *filename)

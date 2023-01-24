@@ -13,19 +13,9 @@ Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
         }
     }
 
+
     // get total_lines, ptr of words,
-    Option_info *text_info = (Option_info *)calloc(total_lines + 2, sizeof(Option_info));
-    /////////////////////////////////////////////////////////////^
-    char sep[10]="{}";
-    int i = 0;
-
-    text_info[i].text_ptr = strtok(buffer, sep);
-
-    while (text_info[i].text_ptr != NULL)
-    {
-        i++;
-        text_info[i].text_ptr = strtok(NULL, sep);
-    }
+    Option_info *text_info = (Option_info *)calloc(total_lines, sizeof(Option_info));
 
     Akinator_Info *Akinator = (Akinator_Info *)calloc(1, sizeof(Akinator_Info));
 
@@ -34,6 +24,40 @@ Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
     Akinator->lines_total = total_lines;
 
     return Akinator;
+}
+
+void FillTree(char *buffer, int pos, Node *node)
+{
+    if(pos == -1) //call func with -1 in main 
+    {
+        Node *bebra = CreateNode(NULL);
+        bebra->left = node;
+
+
+        pos++;
+    }
+    else
+    {
+        while(buffer[pos] != '{' && buffer[pos] != '}')
+        {
+            pos++;
+        }
+
+        if(buffer[pos] == '{')
+        {
+            node = CreateNode(buffer + pos + 1);
+        }
+        else if(buffer[pos] == '}')
+        {
+            pos++;
+            return; 
+        }
+
+        FillTree(buffer, pos, node->left);
+        FillTree(buffer, pos, node->right);
+    
+        return;    
+    }
 }
 
 int CountSymbols(const char *filename)

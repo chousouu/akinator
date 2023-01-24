@@ -1,59 +1,38 @@
 #include "akinator.h"
-/*
- Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size)
-// {
-//     int total_lines = 0;
-//     int word_len = 0; 
 
-//     for(int i = 0; i < buffer_size; i++)
-//     {
-//         if(buffer[i] == '{')
-//         {
-//             total_lines++;
-//         }
-//     }
-
-
-//     // get total_lines, ptr of words,
-//     Option_info *text_info = (Option_info *)calloc(total_lines, sizeof(Option_info));
-
-//     Akinator_Info *Akinator = (Akinator_Info *)calloc(1, sizeof(Akinator_Info));
-
-//     Akinator->buffer = buffer;
-//     Akinator->Strings = text_info;
-//     Akinator->lines_total = total_lines;
-
-//     return Akinator;
-// }
-*/
-Tree *FillTree(char *buffer, int pos, Node *node)
+Tree *FillTree(char *buffer, int *pos, Node *node)
 {
-    if(pos == -1) //call func with -1 in main 
+    if(*pos == -1) // 
     {
-        char *needed = (char *)calloc(4, sizeof(char));
-        strcpy(needed, "pls");
+        char *needed = (char *)calloc(27, sizeof(char));
 
+        strcpy(needed, "Akinator v.42 by yasinchik");
         Tree *Akinator = CreateTree(needed);
 
-        FillTree(buffer, 0, (Akinator->root)->left);
+        (*pos)++;
+        FillTree(buffer, pos, (Akinator->root)->left);
         
         return Akinator;
     }
     else
     {
-        while(buffer[pos] != '{' && buffer[pos] != '}')
+        //ну эта хуйня
+        // не записывает нормальные вещи в правых детей, 
+        //надо как-то поз блять менять или вообще все переписывать
+        while(buffer[*pos] != '{' && buffer[*pos] != '}')
         {
-            pos++;
+            (*pos)++;
         }
 
-        if(buffer[pos] == '{')
+        if(buffer[*pos] == '{')
         {
-            pos++;
-            node = CreateNode(buffer + pos);
+            (*pos)++;
+            node = CreateNode(buffer + *pos);
+            printf("node ->Data : %s\n", node->data);
         }
-        else if(buffer[pos] == '}')
+        else if(buffer[*pos] == '}')
         {
-            pos++;
+            (*pos)++;
             return NULL; 
         }
 

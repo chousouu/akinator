@@ -58,6 +58,7 @@ Tree *FillTree(char *buffer, int pos, Node *node)
         }
 
         FillTree(buffer, pos, node->left);
+        // printf("node->left %s\n",node->left->data );
         FillTree(buffer, pos, node->right);
     
         return NULL;    

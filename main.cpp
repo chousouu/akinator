@@ -7,17 +7,17 @@ int main()
 
     char *buffer = ReadToBuffer("sheesh.txt", size);
 
-    char needed[] = "insane linking methods";
+    Tree *Akinator = FillTree(buffer, -1, NULL);
 
-    Tree *Akinator = CreateTree(needed);
 
-    FillTree(buffer, -1, Akinator->root);
+    printf("Ak.root = %s\n", Akinator->root->data);
+    printf("Ak.root->left = %s\n", (Akinator->root)->left->data);
 
-    // printf("%s\n", NULL);
+    InOrder(Akinator->root);
 
-    // InOrder(akinator->root);
-
-    // TreeDtor(akinator);
+    TreeDtor(Akinator);
+    
+    free(buffer);
 
     return 0;
 }

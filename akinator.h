@@ -23,7 +23,7 @@ struct Akinator_Info
 
 #define DEB(...) printf(__VA_ARGS__)
 
-Akinator_Info *GetAkinatorStruct(char *buffer, int buffer_size);
+Tree *FillTree(char *buffer, int pos, Node *node);
 
 char *ReadToBuffer(const char *filename, int size);
 

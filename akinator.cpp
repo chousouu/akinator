@@ -2,7 +2,7 @@
 
 Tree *FillTree(char *buffer, int *pos, Node *node)
 {
-    if(*pos == -1) // 
+    if(*pos == -1)
     {
         char *needed = (char *)calloc(27, sizeof(char));
 
@@ -16,9 +16,6 @@ Tree *FillTree(char *buffer, int *pos, Node *node)
     }
     else
     {
-        //ну эта хуйня
-        // не записывает нормальные вещи в правых детей, 
-        //надо как-то поз блять менять или вообще все переписывать
         while(buffer[*pos] != '{' && buffer[*pos] != '}')
         {
             (*pos)++;
@@ -37,7 +34,6 @@ Tree *FillTree(char *buffer, int *pos, Node *node)
         }
 
         FillTree(buffer, pos, node->left);
-        // printf("node->left %s\n",node->left->data );
         FillTree(buffer, pos, node->right);
     
         return NULL;    

@@ -7,11 +7,12 @@ int main()
 
     char *buffer = ReadToBuffer("sheesh.txt", size);
 
-    Tree *Akinator = FillTree(buffer, -1, NULL);
+    int pos = -1;
 
+    Tree *Akinator = FillTree(buffer, &pos, NULL);
 
     printf("Ak.root = %s\n", Akinator->root->data);
-    printf("Ak.root->left = %s\n", (Akinator->root)->left->data);
+    printf("Ak.root->left = %p\n", (Akinator->root)->left);
 
     InOrder(Akinator->root);
 

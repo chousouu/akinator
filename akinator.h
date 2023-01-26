@@ -17,13 +17,13 @@ struct Option_info
 struct Akinator_Info
 {
     char *buffer;
-    struct Option_info *Strings;
+    Tree *AkinatorTree;
     int lines_total;
 };
 
 #define DEB(...) printf(__VA_ARGS__)
 
-Tree *FillTree(char *buffer, int *pos, Node *node);
+Akinator_Info *GetAkinatorStruct(char *buffer);
 
 char *ReadToBuffer(const char *filename, int size);
 

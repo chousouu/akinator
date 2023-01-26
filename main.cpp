@@ -5,31 +5,26 @@ int main()
 {
     int size = CountSymbols("sheesh.txt");
 
-
-    
-    
-    printf("size = %d\n", size);
-
-
-
-
     char *buffer = ReadToBuffer("sheesh.txt", size);
-    
-    int pos = -1;
 
-    Tree *Akinator = FillTree(buffer, &pos, NULL);
-
-    printf("Ak.root = %s\n", Akinator->root->data);
-    printf("Ak.root->left = %p\n", (Akinator->root)->left);
-
-    printf("======\nINORDER:\n");
-    InOrder(Akinator->root);
-    printf("\n==============\n");
+    Akinator_Info *Akinator = GetAkinatorStruct(buffer);    
+// DEB("A.root = %p %s\n", Akinator->AkinatorTree->root, Akinator->AkinatorTree->root->data);
+// DEB("1st elem;%p %s\n", (Akinator->AkinatorTree->root)->left, (Akinator->AkinatorTree->root)->left->data);
+// DEB("2nd elem;%p %s\n", (Akinator->AkinatorTree->root)->left->left, (Akinator->AkinatorTree->root)->left->left->data);
+// DEB("3rd elem;%p %s\n", (Akinator->AkinatorTree->root)->left->right, (Akinator->AkinatorTree->root)->left->right->data);
+// DEB("4th elem;%p %s\n", (Akinator->AkinatorTree->root)->left->left->left, (Akinator->AkinatorTree->root)->left->left->left->data);
+// DEB("5th elem;%p %s\n", (Akinator->AkinatorTree->root)->left->left->right, (Akinator->AkinatorTree->root)->left->left->right->data);
+// DEB("6th elem;%p %s\n", (Akinator->AkinatorTree->root)->left->right, (Akinator->AkinatorTree->root)->left->right->data);
 
 
-    free(Akinator->root->data);
-    TreeDtor(Akinator);
+    DEB("======\nINORDER:\n");
+    InOrder(Akinator->AkinatorTree->root);
+    DEB("\n==============\n");
 
+
+    TreeDtor(Akinator->AkinatorTree);
+
+    free(Akinator);
     
     free(buffer);
 

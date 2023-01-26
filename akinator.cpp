@@ -16,26 +16,35 @@ Tree *FillTree(char *buffer, int *pos, Node *node)
     }
     else
     {
+        if(buffer[*pos] == '\0')
+        {
+            return NULL;
+        }
+
         while(buffer[*pos] != '{' && buffer[*pos] != '}')
         {
+            DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
             (*pos)++;
         }
 
         if(buffer[*pos] == '{')
         {
+            DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
             (*pos)++;
             node = CreateNode(buffer + *pos);
+            // node = CreateNode(strtok(buffer + *pos, "{}"));
             printf("node ->Data : %s\n", node->data);
         }
         else if(buffer[*pos] == '}')
         {
+            DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
             (*pos)++;
             return NULL; 
         }
 
         FillTree(buffer, pos, node->left);
         FillTree(buffer, pos, node->right);
-    
+        
         return NULL;    
     }
 }

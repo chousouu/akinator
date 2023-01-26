@@ -6,10 +6,10 @@ Tree *CreateTree(elem_t value)
 
     if(tree == NULL)
     {
-        printf("ERROR CREATETREE\n");
+        printf("ERROR CreateTree\n");
     }
     
-    tree->size = 0;
+    // tree->size = 0;
     
     tree->root = CreateNode(value);
 
@@ -71,7 +71,7 @@ void InOrder(struct Node *tree)
     {
         InOrder(tree->left);
     }
-    printf("%s ", tree->data);
+    printf("%s ;", tree->data);
     if(tree->right)
     {
         InOrder(tree->right);
@@ -86,10 +86,15 @@ void NodeDtor(struct Node *node)
     {
         NodeDtor(node->left);
     }
+    node->left = (Node *) 0x42;
+
     if(node->right)
     {
-        NodeDtor(node->right);   
+        NodeDtor(node->right);
     }
+    node->right = (Node *) 0x42;
+    
+    // free(node->data);
     free(node);
 }
 
@@ -97,6 +102,7 @@ void TreeDtor(struct Tree *tree)
 {
     NodeDtor(tree->root);
     tree->size = 0;
+
     free(tree);
 
     return;

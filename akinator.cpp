@@ -8,8 +8,9 @@ Tree *FillTree(char *buffer, int *pos, Node *node)
 
         strcpy(needed, "Akinator v.42 by yasinchik");
         Tree *Akinator = CreateTree(needed);
-
+        DEB("root = %p\n", Akinator->root);
         (*pos)++;
+        (Akinator->root)->left = CreateNode(NULL);
         FillTree(buffer, pos, (Akinator->root)->left);
         
         return Akinator;
@@ -23,26 +24,26 @@ Tree *FillTree(char *buffer, int *pos, Node *node)
 
         while(buffer[*pos] != '{' && buffer[*pos] != '}')
         {
-            DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
             (*pos)++;
         }
 
         if(buffer[*pos] == '{')
         {
-            DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
             (*pos)++;
-            node = CreateNode(buffer + *pos);
+            DEB("node = %p\n", node);
+            node->data = (buffer + *pos);
+            DEB("created node = %p\n", node);
             // node = CreateNode(strtok(buffer + *pos, "{}"));
             printf("node ->Data : %s\n", node->data);
         }
         else if(buffer[*pos] == '}')
         {
-            DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
-            (*pos)++;
+            // DEB("pos %d (\"%c\")\n", *pos, buffer[*pos]);
             return NULL; 
         }
-
+        node->left = CreateNode(NULL);
         FillTree(buffer, pos, node->left);
+        node->right = CreateNode(NULL);
         FillTree(buffer, pos, node->right);
         
         return NULL;    

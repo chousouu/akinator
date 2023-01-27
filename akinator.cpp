@@ -1,6 +1,6 @@
 #include "akinator.h"
 
-static Tree *FillTree(char *buffer, int *pos, Node *node, int *tree_size)
+static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
 {
     if(*pos == -1)
     {
@@ -10,13 +10,18 @@ static Tree *FillTree(char *buffer, int *pos, Node *node, int *tree_size)
         
         Tree *ATree = CreateTree(needed);
 
-        DEB("root = %p\n", ATree->root);
         (*pos)++;
         (*tree_size)++;
         (ATree->root)->left = CreateNode(NULL);
 
         FillTree(buffer, pos, (ATree->root)->left, tree_size);
         
+        Node *temp_root = ATree->root;
+        ATree->root = (ATree->root)->left;
+        
+        free(needed);
+        free(temp_root);
+
         return ATree;
     }
     else
@@ -31,7 +36,8 @@ static Tree *FillTree(char *buffer, int *pos, Node *node, int *tree_size)
             (*tree_size)++;
             (*pos)++;
             node->data = GetString(buffer + *pos);
-           
+
+//TODO: can be optimized by changing *pos in GetString()           
             while(buffer[*pos] != '{' && buffer[*pos] != '}')
             {
                 (*pos)++;
@@ -88,15 +94,17 @@ char *ReadToBuffer(const char *filename, int size)
     return buffer;
 }
 
-
-//TODO: const char * buffer
-char *GetString(char *buffer)
+char *GetString(const char *buffer)
 {
     int buffer_walker = 0;
     while(buffer[buffer_walker] != '{' && buffer[buffer_walker] != '}')
     {
         buffer_walker++;
     } 
+    if(buffer_walker == 0) 
+    {
+        return NULL;
+    }
 
     char *new_string = (char *)calloc(buffer_walker + 1, sizeof(char));
     strncpy(new_string, buffer, buffer_walker);
@@ -113,24 +121,62 @@ void GraphDump(Akinator_Info *Akinator)
         printf("cannot open graph\n");
         return;
     }
+    fprintf(graph, "digraph g {\n");
 
     fprintf(graph, 
                 "fontname= \"Helvetica,Arial,sans-serif\"\n"
                 "node [fontname=\"Helvetica,Arial,sans-serif\"]\n"
                 "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n"
-                "graph [rankdir = \"LR\"];\n"
+                "graph [rankdir = \"TB\"];\n"
                 "node [fontsize = \"16\" shape = \"ellipse\"];\n"
                 "edge [];\n"
             );
 
-    
-    /*
-    print
-    left
-    right
-    */
+    DumpNodes(graph, Akinator->AkinatorTree->root, CREATE_NODE);
+    DumpNodes(graph, Akinator->AkinatorTree->root, LINK_NODE);
+
+    fprintf(graph, "}");
+
+   fclose(graph);
 }
 
+void DumpNodes(FILE *graph, Node *node, int mode)
+{
+    if(mode == CREATE_NODE)
+    {
+        if(node == NULL || node->data == NULL)
+        {
+            return;
+        }
+
+        fprintf(graph, 
+                    " \"node%s\" [\n"
+                    "label = \"%s\" \n"
+                    "shape = \"record\"\n"
+                    "];\n",
+                    node->data, node->data);
+
+        DumpNodes(graph, node->left, mode);
+        DumpNodes(graph, node->right, mode);
+    }
+    else 
+    {
+        if(node == NULL)
+        {
+            return;
+        }
+        if(node->left != NULL && node->left->data != NULL)
+        {
+            fprintf(graph, " \"node%s\" -> \"node%s\" [color = \"green\"]\n", node->data, node->left->data);
+        }
+        if(node->right != NULL && node->right->data != NULL)
+        {
+            fprintf(graph, " \"node%s\" -> \"node%s\"[color = \"red\"]\n", node->data, node->right->data);
+        }
+        DumpNodes(graph, node->left, mode);
+        DumpNodes(graph, node->right, mode);
+    }
+}
 
 Akinator_Info *GetAkinatorStruct(char *buffer)
 {

@@ -71,7 +71,7 @@ void InOrder(struct Node *tree)
     {
         InOrder(tree->left);
     }
-    printf("%s ;", tree->data);
+    printf("\"%s\" ", tree->data);
     if(tree->right)
     {
         InOrder(tree->right);
@@ -86,15 +86,13 @@ void NodeDtor(struct Node *node)
     {
         NodeDtor(node->left);
     }
-    node->left = (Node *) 0x42;
 
     if(node->right)
     {
         NodeDtor(node->right);
     }
-    node->right = (Node *) 0x42;
     
-    // free(node->data);
+    free(node->data);
     free(node);
 }
 

@@ -1,4 +1,5 @@
 #include "akinator.h"
+#include "stack.h"
 
 static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
 {
@@ -11,12 +12,12 @@ static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
         Tree *ATree = CreateTree(needed);
 
         (*pos)++;
-        (*tree_size)++;
         (ATree->root)->left = CreateNode(NULL);
 
         FillTree(buffer, pos, (ATree->root)->left, tree_size);
         
         Node *temp_root = ATree->root;
+        (ATree->root)->left->parent = NULL;
         ATree->root = (ATree->root)->left;
         
         free(needed);
@@ -57,6 +58,9 @@ static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
 
         node->left  = CreateNode(NULL);
         node->right = CreateNode(NULL);
+
+        node->left->parent = node;
+        node->right->parent = node;
 
         FillTree(buffer, pos, node->left, tree_size);
         FillTree(buffer, pos, node->right, tree_size);
@@ -112,8 +116,48 @@ char *GetString(const char *buffer)
     return new_string;
 }
 
+static void DumpNodes(FILE *graph, Node *node, int mode)
+{
+    if(mode == CREATE_NODE)
+    {
+        if(node == NULL || node->data == NULL)
+        {
+            return;
+        }
+
+        fprintf(graph, 
+                    " \"node%s\" [\n"
+                    "label = \"%s\" \n"
+                    "shape = \"record\"\n"
+                    "];\n",
+                    node->data, node->data);
+
+        DumpNodes(graph, node->left, mode);
+        DumpNodes(graph, node->right, mode);
+    }
+    else //if mode == LINK_NODE
+    {
+        if(node == NULL)
+        {
+            return;
+        }
+        if(node->left != NULL && node->left->data != NULL)
+        {
+            fprintf(graph, " \"node%s\" -> \"node%s\" [color = \"green\"]\n", node->data, node->left->data);
+        }
+        if(node->right != NULL && node->right->data != NULL)
+        {
+            fprintf(graph, " \"node%s\" -> \"node%s\"[color = \"red\"]\n", node->data, node->right->data);
+        }
+        DumpNodes(graph, node->left, mode);
+        DumpNodes(graph, node->right, mode);
+    }
+}
+
+//TODO: add system calls for opening graph dump
 void GraphDump(Akinator_Info *Akinator)
 {
+    fclose(fopen("graph.txt", "w"));
     FILE *graph = fopen("graph.txt", "a");
 
     if(graph == NULL)
@@ -138,44 +182,8 @@ void GraphDump(Akinator_Info *Akinator)
     fprintf(graph, "}");
 
    fclose(graph);
-}
 
-void DumpNodes(FILE *graph, Node *node, int mode)
-{
-    if(mode == CREATE_NODE)
-    {
-        if(node == NULL || node->data == NULL)
-        {
-            return;
-        }
-
-        fprintf(graph, 
-                    " \"node%s\" [\n"
-                    "label = \"%s\" \n"
-                    "shape = \"record\"\n"
-                    "];\n",
-                    node->data, node->data);
-
-        DumpNodes(graph, node->left, mode);
-        DumpNodes(graph, node->right, mode);
-    }
-    else 
-    {
-        if(node == NULL)
-        {
-            return;
-        }
-        if(node->left != NULL && node->left->data != NULL)
-        {
-            fprintf(graph, " \"node%s\" -> \"node%s\" [color = \"green\"]\n", node->data, node->left->data);
-        }
-        if(node->right != NULL && node->right->data != NULL)
-        {
-            fprintf(graph, " \"node%s\" -> \"node%s\"[color = \"red\"]\n", node->data, node->right->data);
-        }
-        DumpNodes(graph, node->left, mode);
-        DumpNodes(graph, node->right, mode);
-    }
+    // system("dot graph.txt -T png -o dump.png");
 }
 
 Akinator_Info *GetAkinatorStruct(char *buffer)
@@ -196,4 +204,154 @@ Akinator_Info *GetAkinatorStruct(char *buffer)
     Akinator->AkinatorTree, Akinator->buffer, Akinator->lines_total);
     
     return Akinator;
+}
+
+static void FreeMe(Akinator_Info *Akinator)
+{
+    //ahh.. finally free...
+    TreeDtor(Akinator->AkinatorTree);
+    free(Akinator->buffer);
+    free(Akinator);
+
+    return;
+}
+
+static char GetChar()
+{
+    char letter = getchar();
+    if(letter != '\n')
+    {
+        char ch = 0;
+        while((ch = getchar()) != '\n')
+        {
+            continue;
+        }
+    }
+
+    return letter;
+}
+
+void PlayAkinator()
+{
+    int size = CountSymbols("sheesh.txt");
+
+    char *buffer = ReadToBuffer("sheesh.txt", size);
+
+    Akinator_Info *Akinator = GetAkinatorStruct(buffer);
+    
+    char interaction = 0;
+
+    printf("Welcome to Akinator!\n"
+        "Press [p]lay/[s]ave/[d]ump/descr[i]ption/[c]ompare/[q]uit\n");
+
+    while((interaction = GetChar()) != 'q')
+    {
+        switch(interaction)
+        {
+            case 'p':
+                printf("Guess:\n");
+                Guess(Akinator->AkinatorTree->root);
+                break;
+            case 's':
+                // printf("SaveTree:\n");
+                // SaveTree(); 
+                break;
+            case 'd':
+                printf("GraphDump:\n");
+                GraphDump(Akinator); 
+                break;
+            case 'i':
+                // printf("Describe:\n");
+                // Describe(Akinator, stk); 
+                break;
+            case 'c': 
+                // printf("Compare:\n");
+                // Compare(); 
+                break;
+
+            default:
+                printf("Invalid input. Type p/s/d/i/c/q");
+                break;
+        }
+        printf("Press [p]lay/[s]ave/[d]ump/descr[i]ption/[c]ompare/[q]uit\n");
+    }
+
+    FreeMe(Akinator);
+    return;
+}
+
+// void Describe(Akinator_Info *Akinator, Stack *stk)
+// {
+//     //TODO: rewrite stack so it accepts pointers 
+// }
+
+//can be written with using stack and ->parent
+void Guess(Node *node)
+{
+    char interaction = '!';
+    Node *tmp_node = NULL; //potentional_answer_node
+    char tmp_interaction = '!';
+
+    while(node != NULL)
+    {
+        printf("%s?\n", node->data);
+        
+        tmp_node = node;
+        tmp_interaction = interaction;
+        
+        interaction = GetChar();
+        if(interaction == 'y')
+        {
+            node = node->left;
+        }
+        else if(interaction == 'n')
+        {
+            node = node->right;
+        }
+        else 
+        {
+            printf("Invalid input. Type y/n \n");
+        }
+    }
+
+    if(interaction == 'n')
+    {
+        printf("What a pity! Do you want to add this person to database?\n");
+        //TODO: add when invalid input 
+        printf("y/n : ");
+        if((interaction = GetChar()) == 'y')
+        {
+            char *guessed_person = (char *)calloc(MAX_CHAR, sizeof(char)); 
+            char *difference = (char *)calloc(MAX_CHAR, sizeof(char)); 
+            
+            printf("Who was it?\n:");
+            scanf("%s", guessed_person);
+
+            printf("Whats the difference between \"%s\" and \"%s\"?\n:", tmp_node->data, guessed_person);
+            scanf("%s", difference);
+
+            Node *temp_node = NULL;
+
+            if(tmp_interaction == 'y')
+            {
+                tmp_node->parent->left = CreateNode(difference);
+                temp_node = tmp_node->parent->left;
+            }
+            else
+            {
+                tmp_node->parent->right = CreateNode(difference);
+                temp_node = tmp_node->parent->right;
+            }
+
+            temp_node->left = CreateNode(guessed_person);
+             
+            temp_node->right = tmp_node;
+            tmp_node->parent = temp_node;
+        }        
+
+    }
+
+    printf("Thanks for playing!\n");
+    
+    return;
 }

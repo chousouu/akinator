@@ -14,6 +14,8 @@ enum graphviz
     LINK_NODE   = 1,
 };
 
+#define MAX_CHAR 30
+
 struct Option_info
 {
     char *text_ptr;
@@ -39,7 +41,9 @@ char *GetString(const char *buffer);
 
 void GraphDump(Akinator_Info *Akinator);
 
-void DumpNodes(FILE *graph, Node *node, int mode);
+void PlayAkinator();
+
+void Guess(Node *node);
 
 #endif// AKINATOR_H
 

@@ -31,6 +31,7 @@ Node *CreateNode(elem_t value)
     node_ptr->data = value;
     node_ptr->left  = NULL;
     node_ptr->right = NULL;
+    node_ptr->parent = NULL;
 
     return node_ptr;
 }

@@ -14,6 +14,7 @@ struct Node
     elem_t data;
     Node *left;
     Node *right;
+    Node *parent;
 };
 
 struct Tree

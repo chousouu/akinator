@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+#include "stack.h"
 #include "tree.h"
 
 enum graphviz
@@ -43,7 +44,14 @@ void GraphDump(Akinator_Info *Akinator);
 
 void PlayAkinator();
 
-void Guess(Node *node);
+void Guess(Akinator_Info *Akinator);
+
+void Describe(Akinator_Info *Akinator);
+
+Node *FindCharacter(Node *node, char * character, Stack *stk);
+
+
+
 
 #endif// AKINATOR_H
 

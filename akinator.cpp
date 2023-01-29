@@ -1,5 +1,4 @@
 #include "akinator.h"
-#include "stack.h"
 
 static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
 {
@@ -250,7 +249,7 @@ void PlayAkinator()
         {
             case 'p':
                 printf("Guess:\n");
-                Guess(Akinator->AkinatorTree->root);
+                Guess(Akinator);
                 break;
             case 's':
                 // printf("SaveTree:\n");
@@ -261,8 +260,8 @@ void PlayAkinator()
                 GraphDump(Akinator); 
                 break;
             case 'i':
-                // printf("Describe:\n");
-                // Describe(Akinator, stk); 
+                printf("Describe:\n");
+                Describe(Akinator); 
                 break;
             case 'c': 
                 // printf("Compare:\n");
@@ -280,23 +279,98 @@ void PlayAkinator()
     return;
 }
 
-// void Describe(Akinator_Info *Akinator, Stack *stk)
-// {
-//     //TODO: rewrite stack so it accepts pointers 
-// }
+Node *FindCharacter(Node *node, char * character, Stack *stk)
+{
+    StackPush(stk, node->data);
 
-//can be written with using stack and ->parent
-void Guess(Node *node)
+    if(strcmp(node->data, character) == 0)
+    {
+        return node;
+    }
+
+    if(node->left != NULL)
+    {
+        Node *result = FindCharacter(node->left, character, stk);
+        if(result) return result;
+    }
+
+    int err_code = 0;
+    
+    if(node->right != NULL)
+    {
+        StackPush(stk, "not");
+        Node *result = FindCharacter(node->right, character, stk);
+        if(result != NULL) 
+        {
+            return result;
+        }
+        else 
+        {
+            StackPop(stk, &err_code);
+        }
+    }
+
+    StackPop(stk, &err_code);
+
+    return NULL;
+}
+
+void Compare(Akinator_Info *Akinator)
+{
+    Stack stk1 = {};
+    StackCtor(&stk1, 10);
+    int err_code = 0;
+
+}
+
+void Describe(Akinator_Info *Akinator)
+{
+    Stack stk = {};
+    StackCtor(&stk, 10);
+    int err_code = 0;
+
+    char *character = (char *)calloc(MAX_CHAR, sizeof(char));
+
+    printf("What character's description you want to hear?\n");
+
+    scanf("%[^\n]", character);
+    getchar(); // skips '\n'
+
+    Node *dest = FindCharacter(Akinator->AkinatorTree->root, character, &stk);
+    
+    printf("dest = %s\n, stk.size = %d\n", dest->data, stk.size);
+    if(dest == NULL)
+    {
+        printf("Unknown object\n");
+    }
+    else
+    {
+        printf("%s -> ", StackPop(&stk, &err_code));
+        for(int i = stk.size; i >= 1; i--)
+        {
+            printf("%d %s ", i, StackPop(&stk, &err_code));
+        }
+        printf("\n");
+    }
+
+    StackDtor(&stk);
+    free(character);
+    return;
+}
+
+void Guess(Akinator_Info *Akinator)
 {
     char interaction = '!';
-    Node *tmp_node = NULL; //potentional_answer_node
+    Node *potentional_answer_node = NULL;
     char tmp_interaction = '!';
+    
+    Node *node = Akinator->AkinatorTree->root;
 
     while(node != NULL)
     {
         printf("%s?\n", node->data);
         
-        tmp_node = node;
+        potentional_answer_node = node;
         tmp_interaction = interaction;
         
         interaction = GetChar();
@@ -327,28 +401,28 @@ void Guess(Node *node)
             printf("Who was it?\n:");
             scanf("%s", guessed_person);
 
-            printf("Whats the difference between \"%s\" and \"%s\"?\n:", tmp_node->data, guessed_person);
+            printf("Whats the difference between \"%s\" and \"%s\"?\n:", potentional_answer_node->data, guessed_person);
             scanf("%s", difference);
+            getchar(); // skips '\n' left after scanf
 
             Node *temp_node = NULL;
 
             if(tmp_interaction == 'y')
             {
-                tmp_node->parent->left = CreateNode(difference);
-                temp_node = tmp_node->parent->left;
+                potentional_answer_node->parent->left = CreateNode(difference);
+                temp_node = potentional_answer_node->parent->left;
             }
             else
             {
-                tmp_node->parent->right = CreateNode(difference);
-                temp_node = tmp_node->parent->right;
+                potentional_answer_node->parent->right = CreateNode(difference);
+                temp_node = potentional_answer_node->parent->right;
             }
 
             temp_node->left = CreateNode(guessed_person);
              
-            temp_node->right = tmp_node;
-            tmp_node->parent = temp_node;
+            temp_node->right = potentional_answer_node;
+            potentional_answer_node->parent = temp_node;
         }        
-
     }
 
     printf("Thanks for playing!\n");

@@ -9,8 +9,6 @@ Tree *CreateTree(elem_t value)
         printf("ERROR CreateTree\n");
     }
     
-    // tree->size = 0;
-    
     tree->root = CreateNode(value);
 
     tree->size = 1;
@@ -36,8 +34,6 @@ Node *CreateNode(elem_t value)
     return node_ptr;
 }
 
-//net tree->size++; ???? nuzhen lix
-
 Node *AddNode(struct Node *tree, elem_t value, int child)
 {
     Node *new_node = CreateNode(value);
@@ -60,7 +56,7 @@ Node *AddNode(struct Node *tree, elem_t value, int child)
 
         tree->right = new_node;
     }
-
+    
     return new_node;
 }
 

@@ -1,6 +1,6 @@
 #include "akinator.h"
 
-char not_[5] = "not ";
+char not_[] = "not ";
 
 static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
 {
@@ -184,7 +184,7 @@ void GraphDump(Akinator_Info *Akinator)
 
    fclose(graph);
 
-    // system("dot graph.txt -T png -o dump.png");
+    system("dot graph.txt -T png -o dump.png");
 }
 
 Akinator_Info *GetAkinatorStruct(char *buffer)
@@ -365,13 +365,9 @@ void Compare(Akinator_Info *Akinator)
     Node *node2 = FindCharacter(Akinator->AkinatorTree->root, character2, &stk2);
     StackPop(&stk2, &err_code); // removing from stack char's name
 
-    if(node1 == NULL) 
+    if(node1 == NULL || node2 == NULL) 
     {
-        printf("Unknown Object1\n");
-    }
-    if(node2 == NULL)
-    {
-        printf("Unknown Object2\n");
+        printf("Unknown Object\n");
     }
     else 
     {
@@ -381,8 +377,8 @@ void Compare(Akinator_Info *Akinator)
         int size1 = stk1.size;
         int size2 = stk2.size;
 
-        char *path1[size1];
-        char *path2[size2];
+        char **path1 = (char**)calloc(size1, sizeof(char*));
+        char **path2 = (char**)calloc(size2, sizeof(char*));
 
         FillArray(1);
         FillArray(2);
@@ -412,6 +408,8 @@ void Compare(Akinator_Info *Akinator)
         {
             if(path2[i]) free(path2[i]);        
         }
+        free(path1);
+        free(path2);
     }
 
     free(character1);
@@ -438,7 +436,6 @@ void Describe(Akinator_Info *Akinator)
 
     Node *dest = FindCharacter(Akinator->AkinatorTree->root, character, &stk);
     
-    printf("dest = %s\n, stk.size = %d\n", dest->data, stk.size);
     if(dest == NULL)
     {
         printf("Unknown object\n");
@@ -448,7 +445,7 @@ void Describe(Akinator_Info *Akinator)
         printf("%s -> ", StackPop(&stk, &err_code));
         for(int i = stk.size; i >= 1; i--)
         {
-            printf("%d %s ", i, StackPop(&stk, &err_code));
+            printf("%s ", StackPop(&stk, &err_code));
         }
         printf("\n");
     }

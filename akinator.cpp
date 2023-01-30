@@ -254,9 +254,17 @@ void PlayAkinator()
                 Guess(Akinator);
                 break;
             case 's':
+            {                
                 printf("SaveTree:\n");
-                SaveTree(Akinator->AkinatorTree->root); 
+                fclose(fopen("new_tree.txt", "w"));
+                FILE *new_tree = fopen("new_tree.txt", "a");
+                
+                SaveTree(Akinator->AkinatorTree->root, new_tree); 
+                
+                fclose(new_tree);
+
                 break;
+            }
             case 'd':
                 printf("GraphDump:\n");
                 GraphDump(Akinator); 
@@ -317,14 +325,18 @@ Node *FindCharacter(Node *node, char * character, Stack *stk)
     return NULL;
 }
 
-void SaveTree(Node *node)
+void SaveTree(Node *node, FILE *new_tree)
 {
-    printf("{");
-    if(node)printf("%s", node->data);
-    if(node->left == NULL && node->right == NULL) {printf("}"); return;}
-    SaveTree(node->left);
-    SaveTree(node->right);
-    printf("}");
+    fprintf(new_tree, "{");
+    
+    if(node) {fprintf(new_tree, "%s", node->data);}
+    
+    if(node->left == NULL && node->right == NULL) {fprintf(new_tree, "}"); return;}
+    
+    SaveTree(node->left, new_tree);
+    SaveTree(node->right, new_tree);
+    
+    fprintf(new_tree, "}");
 }
 
 void Compare(Akinator_Info *Akinator)
@@ -487,11 +499,10 @@ void Guess(Akinator_Info *Akinator)
             char *difference = (char *)calloc(MAX_CHAR, sizeof(char)); 
             
             printf("Who was it?\n:");
-            scanf("%s", guessed_person);
+            scanf("%[^\n]", guessed_person); getchar();
 
             printf("Whats the difference between \"%s\" and \"%s\"?\n:", potentional_answer_node->data, guessed_person);
-            scanf("%s", difference);
-            getchar(); // skips '\n' left after scanf
+            scanf("%[^\n]", difference); getchar(); // skips '\n' left after scanf
 
             Node *temp_node = NULL;
 

@@ -52,7 +52,7 @@ void GraphDump(Akinator_Info *Akinator);
 
 void PlayAkinator();
 
-void SaveTree(Node *node);
+void SaveTree(Node *node, FILE *new_tree);
 
 void Guess(Akinator_Info *Akinator);
 

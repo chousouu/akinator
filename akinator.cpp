@@ -254,8 +254,8 @@ void PlayAkinator()
                 Guess(Akinator);
                 break;
             case 's':
-                // printf("SaveTree:\n");
-                // SaveTree(); 
+                printf("SaveTree:\n");
+                SaveTree(Akinator->AkinatorTree->root); 
                 break;
             case 'd':
                 printf("GraphDump:\n");
@@ -317,19 +317,14 @@ Node *FindCharacter(Node *node, char * character, Stack *stk)
     return NULL;
 }
 
-static int TwoStacksOneSize(Stack *stk1, Stack *stk2)
+void SaveTree(Node *node)
 {
-    int err_code = 0;
-    while(stk2->size > stk1->size)
-    {
-        StackPop(stk2, &err_code);
-    }
-    while(stk2->size < stk1->size)
-    {
-        StackPop(stk1, &err_code);
-    }
-
-    return stk1->size;
+    printf("{");
+    if(node)printf("%s", node->data);
+    if(node->left == NULL && node->right == NULL) {printf("}"); return;}
+    SaveTree(node->left);
+    SaveTree(node->right);
+    printf("}");
 }
 
 void Compare(Akinator_Info *Akinator)

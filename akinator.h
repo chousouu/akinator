@@ -17,11 +17,19 @@ enum graphviz
 
 #define MAX_CHAR 30
 
-struct Option_info
-{
-    char *text_ptr;
-    int len; // is it needed?
-};
+#define FillArray(X)                                                                                      \
+        for(int i = (size##X) - 1; i >= 0; i--) {path##X[i] = (char *)calloc(MAX_CHAR * 2, sizeof(char)); \
+        strcpy(path##X[i], StackPop(&(stk##X), &err_code));}                                              \
+        for(int i = 0; i < (size##X); i++)                                                                \
+        {                                                                                                 \
+            if(i + 1 != (size##X))                                                                        \
+            {if(strcmp((path##X)[i + 1], not_) == 0)                                                      \
+            {                                                                                             \
+                strcat((path##X)[i + 1], (path##X)[i]);                                                   \
+                strcpy(path##X[i], path##X[i + 1]);                                                       \
+                free(path##X[i+1]); path##X[i+1] = NULL;                                                  \
+            }}                                                                                            \
+        }
 
 struct Akinator_Info
 {
@@ -47,6 +55,8 @@ void PlayAkinator();
 void Guess(Akinator_Info *Akinator);
 
 void Describe(Akinator_Info *Akinator);
+
+void Compare(Akinator_Info *Akinator);
 
 Node *FindCharacter(Node *node, char * character, Stack *stk);
 

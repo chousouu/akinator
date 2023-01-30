@@ -1,5 +1,7 @@
 #include "akinator.h"
 
+char not_[5] = "not ";
+
 static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
 {
     if(*pos == -1)
@@ -264,12 +266,12 @@ void PlayAkinator()
                 Describe(Akinator); 
                 break;
             case 'c': 
-                // printf("Compare:\n");
-                // Compare(); 
+                printf("Compare:\n");
+                Compare(Akinator); 
                 break;
 
             default:
-                printf("Invalid input. Type p/s/d/i/c/q");
+                printf("Invalid input. Type p/s/d/i/c/q\n");
                 break;
         }
         printf("Press [p]lay/[s]ave/[d]ump/descr[i]ption/[c]ompare/[q]uit\n");
@@ -298,7 +300,7 @@ Node *FindCharacter(Node *node, char * character, Stack *stk)
     
     if(node->right != NULL)
     {
-        StackPush(stk, "not");
+        StackPush(stk, not_);
         Node *result = FindCharacter(node->right, character, stk);
         if(result != NULL) 
         {
@@ -315,12 +317,103 @@ Node *FindCharacter(Node *node, char * character, Stack *stk)
     return NULL;
 }
 
+static int TwoStacksOneSize(Stack *stk1, Stack *stk2)
+{
+    int err_code = 0;
+    while(stk2->size > stk1->size)
+    {
+        StackPop(stk2, &err_code);
+    }
+    while(stk2->size < stk1->size)
+    {
+        StackPop(stk1, &err_code);
+    }
+
+    return stk1->size;
+}
+
 void Compare(Akinator_Info *Akinator)
 {
-    Stack stk1 = {};
-    StackCtor(&stk1, 10);
     int err_code = 0;
 
+    Stack stk1 = {};
+    StackCtor(&stk1, 10);
+    char *character1 = (char *)calloc(MAX_CHAR, sizeof(char));
+
+    Stack stk2 = {};
+    StackCtor(&stk2, 10);
+    char *character2 = (char *)calloc(MAX_CHAR, sizeof(char));
+
+    printf("Who do you want to compare?\n");
+
+    printf("Character1 : ");
+    scanf("%[^\n]", character1); getchar();
+
+    printf("Character2 : ");
+    scanf("%[^\n]", character2); getchar();
+
+    Node *node1 = FindCharacter(Akinator->AkinatorTree->root, character1, &stk1);
+    StackPop(&stk1, &err_code); // removing from stack char's name
+    
+    Node *node2 = FindCharacter(Akinator->AkinatorTree->root, character2, &stk2);
+    StackPop(&stk2, &err_code); // removing from stack char's name
+
+    if(node1 == NULL) 
+    {
+        printf("Unknown Object1\n");
+    }
+    if(node2 == NULL)
+    {
+        printf("Unknown Object2\n");
+    }
+    else 
+    {
+        printf("Whats the difference between \"%s\" and \"%s\"?\n", node1->data, node2->data);
+        printf("===========================\n");
+
+        int size1 = stk1.size;
+        int size2 = stk2.size;
+
+        char *path1[size1];
+        char *path2[size2];
+
+        FillArray(1);
+        FillArray(2);
+
+        for(int i = 0; i < size1 && i < size2; i++)
+        {
+            if(path1[i] != NULL && path2[i] != NULL)
+            {
+                if(strcmp(path1[i], path2[i]) == 0)
+                {
+                    printf("They are both %s\n", path1[i]);
+                }
+                else
+                {
+                    printf(" \"%s\" is %s, but ", node1->data, path1[i]);
+                    printf(" \"%s\" is %s\n", node2->data, path2[i]);
+                }
+            }
+        }
+        printf("===========================\n");
+
+        for(int i = 0; i < size1; i++)
+        {
+            if(path1[i]) free(path1[i]);        
+        }
+        for(int i = 0; i < size2; i++)
+        {
+            if(path2[i]) free(path2[i]);        
+        }
+    }
+
+    free(character1);
+    StackDtor(&stk1);
+
+    free(character2);
+    StackDtor(&stk2);
+
+    return;
 }
 
 void Describe(Akinator_Info *Akinator)

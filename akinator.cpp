@@ -2,75 +2,59 @@
 
 char not_[] = "not ";
 
-static Tree *FillTree(const char *buffer, int *pos, Node *node, int *tree_size)
+static Tree *FillTree(char **buffer, Node *node, int *tree_size)
 {
-    if(*pos == -1)
+    if(**buffer == '\0')
     {
-        char *needed = (char *)calloc(27, sizeof(char));
-
-        strcpy(needed, "Akinator v.44 by yasinchik");
-        
-        Tree *ATree = CreateTree(needed);
-
-        (*pos)++;
-        (ATree->root)->left = CreateNode(NULL);
-
-        FillTree(buffer, pos, (ATree->root)->left, tree_size);
-        
-        Node *temp_root = ATree->root;
-        (ATree->root)->left->parent = NULL;
-        ATree->root = (ATree->root)->left;
-        
-        free(needed);
-        free(temp_root);
-
-        return ATree;
+        return NULL;
     }
-    else
+
+    if(**buffer == '{')
     {
-        if(buffer[*pos] == '\0')
+        (*tree_size)++;
+        (*buffer)++;
+        node->data = GetString(*buffer);
+    
+        while(**buffer != '{' && **buffer != '}')
         {
-            return NULL;
+            (*buffer)++;
         }
-
-        if(buffer[*pos] == '{')
+        
+        if(**buffer == '}') 
         {
-            (*tree_size)++;
-            (*pos)++;
-            node->data = GetString(buffer + *pos);
-
-//TODO: can be optimized by changing *pos in GetString()           
-            while(buffer[*pos] != '{' && buffer[*pos] != '}')
-            {
-                (*pos)++;
-            }
-           
-            if(buffer[*pos] == '}') 
-            {
-                (*pos)++;
-                return NULL;   
-            }
+            (*buffer)++;
+            return NULL;   
         }
-        else if(buffer[*pos] == '}')
-        {
-            (*pos)++;
-            return NULL; 
-        }
-
-        node->left  = CreateNode(NULL);
-        node->right = CreateNode(NULL);
-
-        node->left->parent = node;
-        node->right->parent = node;
-
-        FillTree(buffer, pos, node->left, tree_size);
-        FillTree(buffer, pos, node->right, tree_size);
-
-        (*pos)++;             
-
-        return NULL;    
     }
+    else if(**buffer == '}')
+    {
+        (*buffer)++;
+        return NULL; 
+    }
+
+    node->left  = CreateNode(NULL);
+    node->right = CreateNode(NULL);
+
+    node->left->parent = node;
+    node->right->parent = node;
+
+    FillTree(buffer,node->left, tree_size);
+    FillTree(buffer,node->right, tree_size);
+
+    (*buffer)++;             
+
+    return NULL;    
 }
+
+static Tree *GetTree(char *buffer, int *tree_size)
+{
+    Tree *ATree = CreateTree(NULL);
+    
+    FillTree(&buffer, ATree->root, tree_size);
+
+    return ATree;
+}
+
 
 int CountSymbols(const char *filename)
 {
@@ -191,19 +175,15 @@ Akinator_Info *GetAkinatorStruct(char *buffer)
 {
     Akinator_Info *Akinator = (Akinator_Info *)calloc(1, sizeof(Akinator_Info));
 
-    int pos = -1;
     int tree_size = 0;
 
     *Akinator = 
     {
         .buffer = buffer,
-        .AkinatorTree = FillTree(buffer, &pos, NULL, &tree_size),
+        .AkinatorTree = GetTree(buffer, &tree_size),
         .lines_total = tree_size,
     };
 
-    DEB("Tree = %p\n buffer = %p\n lines = %d\n", 
-    Akinator->AkinatorTree, Akinator->buffer, Akinator->lines_total);
-    
     return Akinator;
 }
 
